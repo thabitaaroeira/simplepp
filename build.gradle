@@ -3,6 +3,7 @@ plugins {
 	id 'org.jetbrains.kotlin.plugin.spring' version '1.9.25'
 	id 'org.springframework.boot' version '3.5.3'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.liquibase.gradle' version '2.2.0'
 }
 
 group = 'br.com.payuta'
@@ -16,6 +17,10 @@ java {
 
 repositories {
 	mavenCentral()
+	maven { url 'https://maven.liquibase.com' }
+	maven {
+		url "https://repo1.maven.org/maven2/"
+	}
 }
 
 dependencies {
@@ -27,8 +32,12 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
 	implementation 'org.liquibase:liquibase-core'
-	implementation 'org.liquibase.ext:liquibase-hibernate5'
-	
+	implementation 'org.liquibase.ext:liquibase-hibernate5:4.20.0'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+	liquibaseRuntime 'org.liquibase:liquibase-core:4.23.2'
+	liquibaseRuntime 'org.liquibase.ext:liquibase-hibernate5:4.20.0'
+	liquibaseRuntime 'org.postgresql:postgresql:42.5.0' 
+	liquibaseRuntime 'info.picocli:picocli:4.6.3'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'org.postgresql:postgresql'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -38,38 +47,30 @@ dependencies {
 	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.2")
 }
 
+liquibase {
+	activities {
+		main {
+			changelogFile 'src/main/resources/db/changelog/db.changelog-master.xml'
+			url 'jdbc:postgresql://localhost:5432/simplepp'
+			username 'postgres'
+			password '49d68d7b9fb94fae971fa9d8aeb34f17'
+			referenceUrl 'hibernate:spring:br.com.payuta.simplepp.model.User?dialect=org.hibernate.dialect.PostgreSQLDialect'
+		}
+	}
+	runList = 'main'
+}
+
 kotlin {
 	compilerOptions {
 		freeCompilerArgs.addAll '-Xjsr305=strict'
 	}
 }
 
-
-tasks.register('generateLiquibaseChangelog', Exec) {
-	group = 'liquibase'
-	description = 'Generates Liquibase changelog from JPA entities.'
-	commandLine 'java', '-jar', "${configurations.runtimeClasspath.find { it.name.contains('liquibase-core') }}",
-		'--changeLogFile=src/main/resources/db/changelog/db.changelog-master.xml',
-		'--url=hibernate:spring:br.com.payuta.simplepp.model.User?dialect=org.hibernate.dialect.PostgreSQLDialect',
-		'--username=root', '--password=49d68d7b9fb94fae971fa9d8aeb34f17',
-		'generateChangeLog'
-}
-
-tasks.register('updateDatabase', Exec) {
-	group = 'liquibase'
-	description = 'Applies Liquibase changelog to the local PostgreSQL instance.'
-	commandLine 'java', '-jar', "${configurations.runtimeClasspath.find { it.name.contains('liquibase-core') }}",
-		'--changeLogFile=src/main/resources/db/changelog/db.changelog-master.xml',
-		'--url=jdbc:postgresql://localhost:5432/simplepp',
-		'--username=root', '--password=49d68d7b9fb94fae971fa9d8aeb34f17',
-		'update'
-}
-
 tasks.named('test') {
-	dependsOn 'generateLiquibaseChangelog', 'updateDatabase'
+	dependsOn 'generateChangelog', 'update'	
 	useJUnitPlatform()
 }
 
 tasks.named('bootJar') {
-	dependsOn 'generateLiquibaseChangelog', 'updateDatabase'
+	dependsOn 'generateChangelog', 'update'
 }

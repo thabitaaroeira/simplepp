@@ -1,6 +1,6 @@
 package br.com.payuta.simplepp.repository
 
-import br.com.payuta.simplepp.model.User
+import br.com.payuta.simplepp.util.UserTestBuilder
 import br.com.payuta.simplepp.model.UserType
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -14,7 +14,7 @@ class UserRepositoryTest {
 
     @Test
     fun `should save and find user`() {
-        val user = User(type = UserType.USER, name = "John", email = "john@example.com")
+        val user = UserTestBuilder.build()
         val saved = userRepository.save(user)
         val found = userRepository.findById(saved.id).orElse(null)
         assertNotNull(found)
