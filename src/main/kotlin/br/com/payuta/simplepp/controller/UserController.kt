@@ -7,18 +7,16 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/users")
-class UserController @Autowired constructor(private val userService: UserService) {
-    @GetMapping fun getAllUsers(): List<User> = userService.getAllUsers()
+class UserController @Autowired constructor(private val service: UserService) {
+    @GetMapping fun getAll(): List<User> = service.getAll()
 
-    @GetMapping("/{id}")
-    fun getUserById(@PathVariable id: Long): User? = userService.getUserById(id)
+    @GetMapping("/{id}") fun getById(@PathVariable id: Long): User? = service.getById(id)
 
-    @PostMapping fun createUser(@RequestBody user: User): User = userService.createUser(user)
+    @PostMapping fun create(@RequestBody created: User): User = service.create(created)
 
     @PutMapping("/{id}")
-    fun updateUser(@PathVariable id: Long, @RequestBody updatedUser: User): User? =
-            userService.updateUser(id, updatedUser)
+    fun update(@PathVariable id: Long, @RequestBody updated: User): User? =
+            service.update(id, updated)
 
-    @DeleteMapping("/{id}")
-    fun deleteUser(@PathVariable id: Long): Boolean = userService.deleteUser(id)
+    @DeleteMapping("/{id}") fun delete(@PathVariable id: Long): Boolean = service.delete(id)
 }

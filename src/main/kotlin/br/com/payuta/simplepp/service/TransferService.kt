@@ -6,15 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class TransferService @Autowired constructor(private val transferRepository: TransferRepository) {
-    fun getAllTransfers(): List<Transfer> = transferRepository.findAll()
+class TransferService @Autowired constructor(private val repository: TransferRepository) {
+    fun getAll(): List<Transfer> = repository.findAll()
 
-    fun getTransferById(id: Long): Transfer? = transferRepository.findById(id).orElse(null)
+    fun getById(id: Long): Transfer? = repository.findById(id).orElse(null)
 
-    fun createTransfer(transfer: Transfer): Transfer = transferRepository.save(transfer)
+    fun create(created: Transfer): Transfer = repository.save(created)
 
-    fun getTransfersBySender(sender: Long): List<Transfer> = transferRepository.findBySender(sender)
+    fun getBySender(sender: Long): List<Transfer> = repository.findBySender(sender)
 
-    fun getTransfersByRecipient(recipient: Long): List<Transfer> =
-            transferRepository.findByRecipient(recipient)
+    fun getByRecipient(recipient: Long): List<Transfer> = repository.findByRecipient(recipient)
 }

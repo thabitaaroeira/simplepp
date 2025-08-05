@@ -6,23 +6,23 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class UserService @Autowired constructor(private val userRepository: UserRepository) {
-    fun getAllUsers(): List<User> = userRepository.findAll()
+class UserService @Autowired constructor(private val repository: UserRepository) {
+    fun getAll(): List<User> = repository.findAll()
 
-    fun getUserById(id: Long): User? = userRepository.findById(id).orElse(null)
+    fun getById(id: Long): User? = repository.findById(id).orElse(null)
 
-    fun createUser(user: User): User = userRepository.save(user)
+    fun create(created: User): User = repository.save(created)
 
-    fun updateUser(id: Long, updatedUser: User): User? {
-        return if (userRepository.existsById(id)) {
-            val userToUpdate = updatedUser.copy(id = id)
-            userRepository.save(userToUpdate)
+    fun update(id: Long, updated: User): User? {
+        return if (repository.existsById(id)) {
+            val toUpdate = updated.copy(id = id)
+            repository.save(toUpdate)
         } else null
     }
 
-    fun deleteUser(id: Long): Boolean {
-        return if (userRepository.existsById(id)) {
-            userRepository.deleteById(id)
+    fun delete(id: Long): Boolean {
+        return if (repository.existsById(id)) {
+            repository.deleteById(id)
             true
         } else false
     }
